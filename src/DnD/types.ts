@@ -6,7 +6,7 @@ export type Active = {
   id: ID;
   elementRef: MutableRefObject<HTMLElement | null>;
   initialCoordinates: Coordinates;
-  distanceToMove: { x: number; y: number };
+  moveTo: { x: number; y: number };
 };
 
 export type Over = {
@@ -27,7 +27,14 @@ export type Droppable = {
 
 export type Collision = {
   id: ID;
+  elementRef: MutableRefObject<HTMLElement | null>;
+  criteria: number;
 };
+
+export type CollisionDetector = (
+  draggableItem: Draggable,
+  droppableAreas: Droppable[]
+) => Collision[];
 
 export type DraggableMap = Map<ID, Draggable | undefined>;
 
@@ -39,7 +46,7 @@ export type Coordinates = {
 };
 
 type DragEvent = {
-  active: Active;
+  active: Active | null;
   over: Over | null;
 };
 

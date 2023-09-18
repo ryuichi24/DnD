@@ -2,6 +2,7 @@ import { useState } from "react";
 import { DnDContextProvider } from "./DnD";
 import { TestDraggableItem } from "./components/TestDraggableItem/TestDraggableItem";
 import { TestDroppableArea } from "./components/TestDroppableArea/TestDroppableArea";
+// import { closestCenter } from "./DnD/collision-detector";
 
 function App() {
   const [dataItems] = useState<{ id: string; name: string }[]>([
@@ -43,6 +44,7 @@ function App() {
             console.log({ dragCancelEvt });
           },
         }}
+        // collisionDetector={closestCenter}
       >
         <div className="flex gap-[5rem]">
           <div className="">
@@ -54,8 +56,10 @@ function App() {
             </ul>
           </div>
           <div>
-            <h2>Drop here</h2>
-            <TestDroppableArea />
+            <h2>Drop here 1</h2>
+            <TestDroppableArea id={"TestDroppable 1"} />
+            <h2>Drop here 2</h2>
+            <TestDroppableArea id={"TestDroppable 2"} />
           </div>
         </div>
       </DnDContextProvider>

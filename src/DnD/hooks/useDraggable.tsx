@@ -17,9 +17,9 @@ export function useDraggable(args: Args) {
   const transform = useMemo(
     () =>
       isDragging
-        ? `translate3d(${activeItem?.distanceToMove.x}px, ${activeItem?.distanceToMove.y}px, 0)`
+        ? `translate3d(${activeItem?.moveTo.x}px, ${activeItem?.moveTo.y}px, 0)`
         : undefined,
-    [activeItem?.distanceToMove, isDragging]
+    [activeItem?.moveTo, isDragging]
   );
 
   const onPointerDown = (pointerDownEvt: React.PointerEvent<HTMLElement>) => {

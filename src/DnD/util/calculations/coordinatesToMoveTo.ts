@@ -1,6 +1,9 @@
-import { Coordinates } from "../types";
+type Coordinates = {
+  x: number;
+  y: number;
+};
 
-export function calculateDistanceToMove(
+export function coordinatesToMoveTo(
   initialCoordinates: Coordinates,
   currentCoordinates: Coordinates
 ) {
