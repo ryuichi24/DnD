@@ -22,15 +22,33 @@ export function useDraggable(args: Args) {
     [activeItem?.distanceToMove, isDragging]
   );
 
-  const onPointerDown = (onPointerDownEvt: React.PointerEvent<HTMLElement>) => {
+  const onPointerDown = (pointerDownEvt: React.PointerEvent<HTMLElement>) => {
     /**
      * @description
      * Exclude any non-left click actions (0 means left click)
      * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button#value}
      */
-    if (onPointerDownEvt.button !== 0) return;
+    if (pointerDownEvt.button !== 0) return;
 
-    const initialPointerCoordinates = getCoordinates(onPointerDownEvt);
+    const ownerDocument = (pointerDownEvt.target as HTMLElement).ownerDocument;
+    const listenerManager = makeListenerManager(ownerDocument);
+
+    listenerManager.add("pointermove", (pointerMoveEvt: PointerEvent) => {
+      dispatch({
+        type: "onDragMove",
+        payload: {
+          currentPointerCoordinates: getCoordinates(pointerMoveEvt),
+        },
+      });
+    });
+
+    listenerManager.add("pointerup", (pointerUpEvt: PointerEvent) => {
+      listenerManager.removeAll();
+      dispatch({
+        type: "onDragEnd",
+        payload: { currentPointerCoordinates: getCoordinates(pointerUpEvt) },
+      });
+    });
 
     dispatch({
       type: "onDragStart",
@@ -38,33 +56,15 @@ export function useDraggable(args: Args) {
         activeItem: {
           id,
           elementRef,
-          initialCoordinates: initialPointerCoordinates,
+          initialCoordinates: getCoordinates(pointerDownEvt),
         },
       },
-    });
-
-    const ownerDocument = (onPointerDownEvt.target as HTMLElement)
-      .ownerDocument;
-
-    const listenerManager = makeListenerManager(ownerDocument);
-
-    listenerManager.add("pointermove", (onPointerMoveEvt: PointerEvent) => {
-      const currentPointerCoordinates = getCoordinates(onPointerMoveEvt);
-      dispatch({
-        type: "onDragMove",
-        payload: { currentPointerCoordinates: currentPointerCoordinates },
-      });
-    });
-
-    listenerManager.add("pointerup", () => {
-      dispatch({ type: "OnDragEnd" });
-      listenerManager.removeAll();
     });
   };
 
   useEffect(() => {
     dispatch({
-      type: "draggableElementMounted",
+      type: "onDraggableElementMounted",
       payload: {
         draggableItem: {
           id,
@@ -74,7 +74,7 @@ export function useDraggable(args: Args) {
     });
     return () => {
       dispatch({
-        type: "draggableElementUnmounted",
+        type: "onDraggableElementUnmounted",
         payload: {
           id,
         },

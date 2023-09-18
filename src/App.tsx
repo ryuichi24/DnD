@@ -25,7 +25,25 @@ function App() {
 
   return (
     <div className="flex justify-center mt-[4rem]">
-      <DnDContextProvider>
+      <DnDContextProvider
+        eventListeners={{
+          onDragStart(dragStartEvt) {
+            console.log({ dragStartEvt });
+          },
+          onDragMove(dragMoveEvt) {
+            console.log({ dragMoveEvt });
+          },
+          onDragOver(dragOverEvt) {
+            console.log({ dragOverEvt });
+          },
+          onDragEnd(dragEndEvt) {
+            console.log({ dragEndEvt });
+          },
+          onDragCancel(dragCancelEvt) {
+            console.log({ dragCancelEvt });
+          },
+        }}
+      >
         <div className="flex gap-[5rem]">
           <div className="">
             <h1>Drag one</h1>

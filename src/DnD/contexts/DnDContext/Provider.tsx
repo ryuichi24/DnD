@@ -2,30 +2,40 @@ import React, { useEffect, useReducer } from "react";
 import { dndContext } from "./Context";
 import { State, Action, makeInitState } from "./store";
 import { calculateDistanceToMove } from "../../util/calculateDistanceToMove";
+import { DnDEventListeners } from "../../types";
 
 function reducer(state: State, action: Action): State {
   const { type } = action;
   switch (type) {
-    case "draggableElementMounted": {
+    case "onDnDInitialized": {
+      const { payload: eventListeners } = action;
+      return { ...state, eventListeners: { ...eventListeners } };
+    }
+    case "onDraggableElementMounted": {
       const draggableItemMap = new Map(state.draggableItems);
       const { draggableItem } = action.payload;
       draggableItemMap.set(draggableItem.id, draggableItem);
       return { ...state, draggableItems: draggableItemMap };
     }
-    case "draggableElementUnmounted": {
+    case "onDraggableElementUnmounted": {
       const draggableItemMap = new Map(state.draggableItems);
       const { id } = action.payload;
       draggableItemMap.delete(id);
       return { ...state, draggableItems: draggableItemMap };
     }
     case "onDragStart": {
-      const { activeItem } = action.payload;
+      const { activeItem: initialActiveItem } = action.payload;
+      const activeItem = {
+        ...initialActiveItem,
+        distanceToMove: { x: 0, y: 0 },
+      };
+      const { onDragStart } = state.eventListeners;
+      if (onDragStart) {
+        onDragStart({ active: activeItem });
+      }
       return {
         ...state,
-        activeItem: {
-          ...activeItem,
-          distanceToMove: { x: 0, y: 0 },
-        },
+        activeItem,
       };
     }
     case "onDragMove": {
@@ -42,10 +52,10 @@ function reducer(state: State, action: Action): State {
         },
       };
     }
-    case "OnDragEnd": {
+    case "onDragEnd": {
       return { ...state, activeItem: null };
     }
-    case "droppableElementMounted": {
+    case "onDroppableElementMounted": {
       return { ...state };
     }
     default:
@@ -54,18 +64,34 @@ function reducer(state: State, action: Action): State {
 }
 
 type DnDContextProviderProps = React.PropsWithChildren & {
-  //
+  eventListeners?: DnDEventListeners;
 };
 
-export const DnDContextProvider = ({ children }: DnDContextProviderProps) => {
+export const DnDContextProvider = (props: DnDContextProviderProps) => {
+  const { children } = props;
   const [state, dispatch] = useReducer(reducer, makeInitState());
   const { activeItem } = state;
 
-  const overId = "";
-
   useEffect(() => {
-    // onDragOver
-  }, [overId]);
+    dispatch({
+      type: "onDnDInitialized",
+      payload: {
+        ...props.eventListeners,
+      },
+    });
+  }, [props.eventListeners]);
+
+  const overId = "";
+  // on Drag Over
+  useEffect(() => {
+    if (!activeItem) {
+      return;
+    }
+
+    dispatch({
+      type: "onDragOver",
+    });
+  }, [overId, activeItem]);
 
   return (
     <dndContext.Provider

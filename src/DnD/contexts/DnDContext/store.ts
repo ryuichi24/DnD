@@ -1,9 +1,17 @@
-import { ID, Droppable, Draggable, Active, Coordinates } from "../../types";
+import {
+  ID,
+  Droppable,
+  Draggable,
+  Active,
+  Coordinates,
+  DnDEventListeners,
+} from "../../types";
 
 export type State = {
   activeItem: Active | null;
   droppableAreas: Map<ID, Droppable>;
   draggableItems: Map<ID, Draggable>;
+  eventListeners: DnDEventListeners;
 };
 
 /**
@@ -13,13 +21,13 @@ export type State = {
  */
 export type Action =
   | {
-      type: "draggableElementMounted";
+      type: "onDraggableElementMounted";
       payload: {
         draggableItem: Draggable;
       };
     }
   | {
-      type: "draggableElementUnmounted";
+      type: "onDraggableElementUnmounted";
       payload: {
         id: ID;
       };
@@ -37,14 +45,25 @@ export type Action =
       };
     }
   | {
-      type: "OnDragEnd";
+      type: "onDragEnd";
+      payload: {
+        currentPointerCoordinates: Coordinates;
+      };
     }
-  | { type: "droppableElementMounted" };
+  | {
+      type: "onDragOver";
+    }
+  | { type: "onDroppableElementMounted" }
+  | {
+      type: "onDnDInitialized";
+      payload: DnDEventListeners;
+    };
 
 export function makeInitState(): State {
   return {
     activeItem: null,
     droppableAreas: new Map(),
     draggableItems: new Map(),
+    eventListeners: {},
   };
 }

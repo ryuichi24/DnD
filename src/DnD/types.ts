@@ -37,3 +37,26 @@ export type Coordinates = {
   x: number;
   y: number;
 };
+
+type DragEvent = {
+  active: Active;
+  over: Over | null;
+};
+
+export type DragStartEvent = Omit<DragEvent, "over">;
+
+export type DragMoveEvent = DragEvent;
+
+export type DragOverEvent = DragEvent;
+
+export type DragEndEvent = DragEvent;
+
+export type DragCancelEvent = DragEvent;
+
+export type DnDEventListeners = {
+  onDragStart?(dragStartEvt: DragStartEvent): void;
+  onDragMove?(dragMoveEvt: DragMoveEvent): void;
+  onDragOver?(dragOverEvt: DragOverEvent): void;
+  onDragEnd?(dragEndEvt: DragEndEvent): void;
+  onDragCancel?(dragCancelEvt: DragCancelEvent): void;
+};
